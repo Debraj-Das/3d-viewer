@@ -64,7 +64,7 @@
             left: 0;
             opacity: 0;
             /* transition: opacity 0.1s ease-in-out; */
-            animation:progress_delay 1.2s infinite  ease-in-out;
+            animation: progress_delay 1.2s infinite ease-in-out;
         }
 
         .controls {
@@ -106,6 +106,13 @@
             gap: 5px;
             cursor: pointer;
         }
+
+        .options-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-direction: row;
+        }
     </style>
 </head>
 
@@ -113,12 +120,26 @@
     <header>
         <nav>
             <h1 style="margin: 0;">Image Rotator</h1>
-            <div>
-                <label for="sofaSelect" style="margin-right: 10px;">Choose Sofa Type:</label>
-                <select id="sofaSelect" onchange="onSofaTypeChange()" style="padding: 5px 10px; border-radius: 5px;">
-                    <option value="bc1" selected>Sofa type 1</option>
-                    <option value="bc2" >Sofa type 2</option>
-                </select>
+            <div class="options-dropdown">
+                <div>
+                    <label for="sofaSelect" style="margin-right: 10px;">Choose Sofa Type:</label>
+                    <select id="sofaSelect" onchange="onSofaTypeChange()"
+                        style="padding: 5px 10px; border-radius: 5px;">
+                        <option value="bc1" selected>Sofa type 1</option>
+                        <option value="bc2">Sofa type 2</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="TimeSelect" style="margin-right: 10px;">Choose Rotations Time:</label>
+                    <select id="TimeSelect" onchange="onTimeChange()"
+                        style="padding: 5px 10px; border-radius: 5px;">
+                        <option value="500" selected>0.5 sec</option>
+                        <option value="400">0.4 sec</option>
+                        <option value="250">0.25 sec</option>
+                        <option value="200">0.2 sec</option>
+                        <option value="1000">1 sec</option>
+                    </select>
+                </div>
             </div>
         </nav>
     </header>
@@ -164,7 +185,7 @@
         const label = document.getElementById('toggle-label');
         let currentImageIndex = 0;
         let rotationInterval = null;
-        const interval = 250; // 100 milliseconds
+        let interval = 500;
 
         let isRotating = false;
         let totalImages = 70;
@@ -175,11 +196,20 @@
             directory = select.value;
             if (directory === 'bc4') {
                 totalImages = 70;
-            }else if (directory === 'bc3') {
+            } else if (directory === 'bc3') {
                 totalImages = 72;
             }
             resetRotation();
         }
+
+        function onTimeChange() {
+            const select = document.getElementById('TimeSelect');
+            timeValue = select.value;
+            interval = timeValue;
+        }
+
+        // init the set the img in imageElement
+        imageElement.src = `img/${directory}/${currentImageIndex + 1}.jpg`;
 
         function updateImage(index) {
             const src = `img/${directory}/${index + 1}.jpg`;
