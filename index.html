@@ -45,8 +45,8 @@
             justify-content: center;
             align-items: center;
             background: white;
-            width: 960px;
-            height: 720px;
+            width: 1080px;
+            height: 800px;
             border: 3px solid white;
             border-radius: 15px;
             overflow: hidden;
@@ -63,8 +63,8 @@
             top: 0;
             left: 0;
             opacity: 0;
-            transition: opacity 0.1s ease-in-out;
-            /* animation:progress_delay 1.2s infinite  ease-in-out; */
+            /* transition: opacity 0.1s ease-in-out; */
+            animation:progress_delay 1.2s infinite  ease-in-out;
         }
 
         .controls {
@@ -164,7 +164,7 @@
         const label = document.getElementById('toggle-label');
         let currentImageIndex = 0;
         let rotationInterval = null;
-        const interval = 100; // 100 milliseconds
+        const interval = 250; // 100 milliseconds
 
         let isRotating = false;
         let totalImages = 70;
@@ -186,7 +186,7 @@
 
             // Fade out, change src, fade in
             setTimeout(() => {
-                imageElement.style.opacity = 0;
+                // imageElement.style.opacity = 0;
                 imageElement.src = src;
             }, interval);
         }
