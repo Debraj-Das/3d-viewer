@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Rotator Viewer</title>
+    <link rel="icon" href="./img/basic/fullscreenon.svg" type="image/svg+xml">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2px;
+            text-align: center;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        h1 {
+            color: black;
+            margin-bottom: 20px;
+        }
+
+        .image-viewer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            width: 960px;
+            height: 720px;
+            border: 3px solid white;
+            border-radius: 15px;
+            overflow: hidden;
+            background: white;
+            position: relative;
+            margin: 0 auto 20px auto;
+        }
+
+        #rotatorImage {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.1s ease-in-out;
+            /* animation:progress_delay 1.2s infinite  ease-in-out; */
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button {
+            background: rgba(12, 240, 27, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgb(1, 255, 175);
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .info {
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .button-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <h1 style="margin: 0;">Image Rotator</h1>
+            <div>
+                <label for="sofaSelect" style="margin-right: 10px;">Choose Sofa Type:</label>
+                <select id="sofaSelect" onchange="onSofaTypeChange()" style="padding: 5px 10px; border-radius: 5px;">
+                    <option value="bc1" selected>Sofa type 1</option>
+                    <option value="bc2" >Sofa type 2</option>
+                </select>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+
+        <div class="image-viewer">
+            <img id="rotatorImage" src="" alt="Rotating Image" draggable="false" />
+
+        </div>
+
+        <div class="controls">
+            <button onclick="showPreviousImage()">
+                <div class="button-content">
+                    <img id="previous-icon" src="./img/basic/left.svg" alt="Previous" width="18" height="18" />
+                    <div id="previous-label">Previous</div>
+                </div>
+            </button>
+            <button onclick="toggleRotation()">
+                <div class="button-content">
+                    <img id="toggle-icon" src="./img/basic/play.svg" alt="Play" width="18" height="18" />
+                    <div id="toggle-label">start</div>
+                </div>
+            </button>
+            <button onclick="resetRotation()">
+                <div class="button-content">
+                    <img id="reset-icon" src="./img/basic/reset.svg" alt="reset" width="18" height="18" />
+                    <div id="reset-label">Reset</div>
+                </div>
+            </button>
+            <button onclick="showNextImage()">
+                <div class="button-content">
+                    <img id="next-icon" src="./img/basic/right.svg" alt="Next" width="18" height="18" />
+                    <div id="next-label">Next</div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const imageElement = document.getElementById('rotatorImage');
+        const currentImageLabel = document.getElementById('currentImage');
+        const icon = document.getElementById('toggle-icon');
+        const label = document.getElementById('toggle-label');
+        let currentImageIndex = 0;
+        let rotationInterval = null;
+        const interval = 100; // 100 milliseconds
+
+        let isRotating = false;
+        let totalImages = 70;
+        let directory = 'bc1';
+
+        function onSofaTypeChange() {
+            const select = document.getElementById('sofaSelect');
+            directory = select.value;
+            if (directory === 'bc4') {
+                totalImages = 70;
+            }else if (directory === 'bc3') {
+                totalImages = 72;
+            }
+            resetRotation();
+        }
+
+        function updateImage(index) {
+            const src = `img/${directory}/${index + 1}.jpg`;
+
+            // Fade out, change src, fade in
+            setTimeout(() => {
+                imageElement.style.opacity = 0;
+                imageElement.src = src;
+            }, interval);
+        }
+
+        // Wait for image to load before fading in
+        imageElement.onload = () => {
+            imageElement.style.opacity = 1;
+        };
+
+        function showNextImage() {
+            currentImageIndex = (currentImageIndex + 1) % totalImages;
+            updateImage(currentImageIndex);
+        }
+
+        function showPreviousImage() {
+            currentImageIndex = (currentImageIndex - 1 + totalImages) % totalImages;
+            updateImage(currentImageIndex);
+        }
+
+        function toggleRotation() {
+            if (!isRotating) {
+                startRotation()
+            } else {
+                stopRotation();
+            }
+        }
+
+        function startRotation() {
+            isRotating = true;
+            rotationInterval = setInterval(showNextImage, interval);
+            icon.src = './img/basic/pause.svg';
+            label.textContent = 'Stop';
+        }
+
+        function stopRotation() {
+            isRotating = false;
+            clearInterval(rotationInterval);
+            icon.src = './img/basic/play.svg';
+            label.textContent = 'Start';
+        }
+
+        function resetRotation() {
+            stopRotation();
+            currentImageIndex = 0;
+            updateImage(currentImageIndex);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function (event) {
+            switch (event.key) {
+                case ' ':
+                    event.preventDefault();
+                    toggleRotation();
+                    break;
+                case 'r':
+                case 'R':
+                    resetRotation();
+                    break;
+                case 'ArrowRight':
+                    event.preventDefault();
+                    if (!isRotating) showNextImage();
+                    break;
+                case 'ArrowLeft':
+                    event.preventDefault();
+                    if (!isRotating) showPreviousImage();
+                    break;
+            }
+        });
+
+        // Initialize
+        window.onload = () => {
+            updateImage(currentImageIndex);
+        };
+
+        // Click + Drag to Rotate
+        let isDragging = false;
+        let startX = 0;
+        let dragThreshold = 10;
+        let lastImageIndex = 0;
+
+        const imageContainer = document.querySelector('.container');
+
+        imageContainer.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+            lastImageIndex = currentImageIndex;
+            imageContainer.style.cursor = 'grabbing';
+        });
+
+        imageContainer.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            const deltaX = e.clientX - startX;
+
+            if (Math.abs(deltaX) >= dragThreshold) {
+                if (deltaX > 0) {
+                    currentImageIndex = (lastImageIndex + 1) % totalImages;
+                } else {
+                    currentImageIndex = (lastImageIndex - 1 + totalImages) % totalImages;
+                }
+
+                updateImage(currentImageIndex);
+
+                // Reset tracking
+                startX = e.clientX;
+                lastImageIndex = currentImageIndex;
+            }
+        });
+
+        ['mouseup', 'mouseleave'].forEach(event => {
+            imageContainer.addEventListener(event, () => {
+                isDragging = false;
+                imageContainer.style.cursor = 'default';
+            });
+        });
+
+
+    </script>
+</body>
+
+</html>
